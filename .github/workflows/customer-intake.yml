@@ -20,6 +20,7 @@ jobs:
             }
             const issue = context.payload.issue;
             const text = ((issue.title || '') + ' ' + (issue.body || '')).toLowerCase();
+            if (/\[test\]/i.test(issue.title || '')) { core.info('Test issue: no customer quote needed.'); return; }
             if (!issue.body || issue.body.trim().length < 30) {
               core.info('Request is too short; leave for manual review.');
               return;
@@ -46,7 +47,7 @@ jobs:
               core.info('Already quoted; skipping.');
               return;
             }
-            const selected = found.reduce((a,b) => b.price > a.price ? b : a);
+            const selected = found.find(x => x.label === 'CSV cleanup') || found.find(x => x.label === 'API integration review') || found[0];
             const body = [
               marker,
               'Thank you for your request.',
