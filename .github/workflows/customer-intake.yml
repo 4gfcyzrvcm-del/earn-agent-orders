@@ -1,0 +1,63 @@
+name: Respond to new customer requests
+on:
+  issues:
+    types: [opened, edited, reopened]
+  workflow_dispatch:
+permissions:
+  issues: write
+jobs:
+  quote:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch' || github.event.issue.pull_request == null
+    steps:
+      - name: Prepare an indicative response
+        uses: actions/github-script@v7
+        with:
+          script: |
+            if (!context.payload.issue) {
+              core.info('Manual run: no incoming issue to quote.');
+              return;
+            }
+            const issue = context.payload.issue;
+            const text = ((issue.title || '') + ' ' + (issue.body || '')).toLowerCase();
+            if (!issue.body || issue.body.trim().length < 30) {
+              core.info('Request is too short; leave for manual review.');
+              return;
+            }
+            const prices = [
+              { pattern: /github actions|workflow|ci\/cd/, label: 'GitHub Actions troubleshooting', price: 25 },
+              { pattern: /csv|deduplicat|spreadsheet/, label: 'CSV cleanup', price: 20 },
+              { pattern: /python|bash|script/, label: 'Small script review', price: 25 },
+              { pattern: /api|integration/, label: 'API integration review', price: 40 },
+              { pattern: /automat/, label: 'Simple automation review', price: 25 }
+            ];
+            const found = prices.filter(x => x.pattern.test(text));
+            if (!found.length) {
+              core.info('No clear category; needs human review.');
+              return;
+            }
+            const marker = '<!-- earn-agent-auto-quote-v1 -->';
+            const { owner, repo } = context.repo;
+            const number = issue.number;
+            const comments = await github.paginate(github.rest.issues.listComments, {
+              owner, repo, issue_number: number, per_page: 100
+            });
+            if (comments.some(x => (x.body || '').includes(marker))) {
+              core.info('Already quoted; skipping.');
+              return;
+            }
+            const selected = found.reduce((a,b) => b.price > a.price ? b : a);
+            const body = [
+              marker,
+              'Thank you for your request.',
+              '',
+              '**Preliminary category:** ' + selected.label,
+              '**Indicative starting price:** $' + selected.price + ' USD.',
+              '',
+              'This is an automated estimate, **not** acceptance of the job or a payment request. Final pricing, deliverables, deadline, acceptance criteria, refund/dispute terms and payment method must be agreed before work starts.',
+              '',
+              'Please confirm: (1) inputs without secrets or personal data, (2) expected output, (3) acceptance criteria, and (4) deadline.',
+              '',
+              'Payment instructions are provided only after an agreed scope. Never post wallet credentials or other secrets in public issues.'
+            ].join('\n');
+            await github.rest.issues.createComment({ owner, repo, issue_number: number, body });
