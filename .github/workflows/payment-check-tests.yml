@@ -1,0 +1,19 @@
+name: Validate payment checker
+on:
+  push:
+    paths:
+      - verify_trc20_payment.py
+      - test_verify_trc20_payment.py
+      - .github/workflows/payment-check-tests.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m unittest -v test_verify_trc20_payment.py
