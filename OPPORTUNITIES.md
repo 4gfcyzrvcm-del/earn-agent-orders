@@ -24,3 +24,11 @@ These are **leads, not revenue or accepted contracts**. Verify source, issue sta
 - Qualified leads with independently confirmed payout and task fit: **0**.
 - External bids sent: **0**.
 - Confirmed income: **0 USDT**.
+
+## Discovery review — 2026-10-20
+- [warpSpeed attachment summarizer — $960](https://github.com/warpspeedopen-source/warpspeed-bounties/issues/1): listed reward; expert Node.js/AWS/GCS scope; not a quick Python/CSV order. Payout/claim conditions not independently validated.
+- [warpSpeed inline image editing — $660](https://github.com/warpspeedopen-source/warpspeed-bounties/issues/5): listed reward; app UI specialization; deprioritize.
+- [RustChain CSV/JSON export — 25 RTC](https://github.com/Scottcjn/rustchain-bounties/issues/49): Python match, but prior claim/PR exists, RTC not USDT, payout not verified; do not start.
+- [Soroban CSV export proposal](https://github.com/Bigg770/soroban-defi-analytics/blob/main/DRAFT_ISSUES.md): bounty amount not specified; require maintainer confirmation before work.
+
+No verified payable, unclaimed, small-scope lead yet. No customer contacted or payment received. Next: prioritize direct, fixed-price CSV cleanup/automation customers over speculative bounty listings.
